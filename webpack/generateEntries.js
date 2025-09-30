@@ -9,12 +9,15 @@ module.exports = function generateEntries (appsetupPaths, isProd, context) {
     const entries = {};
     const plugins = [
         new WebpackBar(),
-        new IgnorePlugin(/^\.\/locale$/, /moment$/),
-        new CopyWebpackPlugin(
-            [
-                { from: 'resources', to: 'resources', context }
+        new IgnorePlugin({
+            resourceRegExp: /^\.\/locale$/,
+            contextRegExp: /moment$/
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: path.resolve(context + 'resources'), to: 'resources' }
             ]
-        )
+        })
     ];
 
     appsetupPaths.forEach(appDir => {
@@ -31,13 +34,15 @@ module.exports = function generateEntries (appsetupPaths, isProd, context) {
             return;
         }
         const appName = path.basename(appDir);
-        const copyDef = [
-            { from: appDir, to: appName },
-            { from: 'resources/icons.css', to: appName, context },
-            { from: 'resources/icons.png', to: appName, context }
-        ];
+        const copyDef = {
+            patterns: [
+                { from: appDir, to: appName },
+                { from: path.resolve(context + 'resources/icons.css'), to: appName },
+                { from: path.resolve(context + 'resources/icons.png'), to: appName }
+            ]
+        };
         if (!isProd) {
-            copyDef.push({ from: 'webpack/empty.js', to: path.join(appName, 'oskari.min.css'), context }); // empty CSS to keep browser happy in dev mode
+            copyDef.patterns.push({ from: path.resolve(context + 'webpack/empty.js'), to: path.join(appName, 'oskari.min.css') }); // empty CSS to keep browser happy in dev mode
         }
         entries[appName] = [
             path.resolve(context, './webpack/polyfill.js'),

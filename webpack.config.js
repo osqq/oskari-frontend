@@ -1,7 +1,8 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
+
 const OskariConfig = require('./webpack/config.js');
 const parseParams = require('./webpack/parseParams.js');
 const { lstatSync, readdirSync, existsSync } = require('fs');
@@ -35,16 +36,18 @@ module.exports = (env, argv) => {
     cesiumSourceOptions
         .filter(possiblePath => existsSync(path.join(__dirname, possiblePath)))
         .forEach(possibleSrcPath => {
-            plugins.push(new CopywebpackPlugin([
-                { from: path.join(__dirname, possibleSrcPath, '../Source/Assets'), to: cesiumTarget + '/Assets' },
-                // This is not available under Build folder:
-                // - oskari-frontend/node_modules/@cesium/engine/Source/ThirdParty/draco_decoder.wasm
-                { from: path.join(__dirname, possibleSrcPath, '../Source/ThirdParty'), to: cesiumTarget + '/ThirdParty' },
-                { from: path.join(__dirname, possibleSrcPath, 'Workers'), to: cesiumTarget + '/Workers' },
-                // { from: path.join(__dirname, possibleSrcPath, 'Widgets'), to: cesiumTarget + '/Widgets' },
-                // copy Cesium's minified third-party scripts
-                { from: path.join(__dirname, possibleSrcPath, 'ThirdParty'), to: cesiumTarget + '/ThirdParty' }
-            ]));
+            plugins.push(new CopywebpackPlugin({
+                patterns: [
+                    { from: path.join(__dirname, possibleSrcPath, '../Source/Assets'), to: cesiumTarget + '/Assets' },
+                    // This is not available under Build folder:
+                    // - oskari-frontend/node_modules/@cesium/engine/Source/ThirdParty/draco_decoder.wasm
+                    { from: path.join(__dirname, possibleSrcPath, '../Source/ThirdParty'), to: cesiumTarget + '/ThirdParty' },
+                    { from: path.join(__dirname, possibleSrcPath, 'Workers'), to: cesiumTarget + '/Workers' },
+                    // { from: path.join(__dirname, possibleSrcPath, 'Widgets'), to: cesiumTarget + '/Widgets' },
+                    // copy Cesium's minified third-party scripts
+                    { from: path.join(__dirname, possibleSrcPath, 'ThirdParty'), to: cesiumTarget + '/ThirdParty' }
+                ]
+            }));
         });
 
     // Define relative base path in Cesium for loading assets
@@ -55,7 +58,6 @@ module.exports = (env, argv) => {
     // Common config for both prod & dev
     const config = {
         node: {
-            fs: 'empty'
         },
         amd: {
             // Enable webpack-friendly use of require in Cesium
@@ -63,7 +65,7 @@ module.exports = (env, argv) => {
         },
         mode: isProd ? 'production' : 'development',
         entry: entries,
-        devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
+        devtool: isProd ? 'source-map' : 'eval-source-map',
         output: {
             path: path.resolve(`dist/${version}/`),
             publicPath: `${publicPathPrefix}Oskari/dist/${version}/`,
@@ -84,11 +86,11 @@ module.exports = (env, argv) => {
     if (isProd) {
         config.optimization = {
             minimizer: [
-                new UglifyJsPlugin({
+                new TerserPlugin({
                     sourceMap: true,
                     parallel: true
                 }),
-                new OptimizeCSSAssetsPlugin({})
+                new CssMinimizerWebpackPlugin({})
             ]
         };
     } else {
