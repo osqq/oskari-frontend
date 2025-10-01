@@ -63,6 +63,9 @@ module.exports = (env, argv) => {
             // Enable webpack-friendly use of require in Cesium
             toUrlUndefined: true
         },
+        cache: {
+            type: 'filesystem'
+        },
         mode: isProd ? 'production' : 'development',
         entry: entries,
         devtool: isProd ? 'source-map' : 'eval-source-map',
@@ -70,6 +73,7 @@ module.exports = (env, argv) => {
             path: path.resolve(`dist/${version}/`),
             publicPath: `${publicPathPrefix}Oskari/dist/${version}/`,
             filename: '[name]/oskari.min.js',
+            assetModuleFilename: 'assets/[hash][ext][query]',
 
             // Needed to compile multiline strings in Cesium
             sourcePrefix: ''

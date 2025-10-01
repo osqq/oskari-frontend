@@ -1,7 +1,7 @@
 const path = require('path');
 const { IgnorePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const LocalizationPlugin = require('./localizationPlugin.js');
+const LocalizationPlugin = require('./localizationPluginFor5.js');
 const WebpackBar = require('webpackbar');
 const { existsSync } = require('fs');
 
@@ -34,22 +34,20 @@ module.exports = function generateEntries (appsetupPaths, isProd, context) {
             return;
         }
         const appName = path.basename(appDir);
-        const copyDef = {
-            patterns: [
-                { from: appDir, to: appName },
-                { from: path.resolve(context + 'resources/icons.css'), to: appName },
-                { from: path.resolve(context + 'resources/icons.png'), to: appName }
-            ]
-        };
+        const copyDef = [
+            { from: appDir, to: appName },
+            { from: path.resolve(context + '/resources/icons.css'), to: appName },
+            { from: path.resolve(context + '/resources/icons.png'), to: appName }
+        ];
         if (!isProd) {
-            copyDef.patterns.push({ from: path.resolve(context + 'webpack/empty.js'), to: path.join(appName, 'oskari.min.css') }); // empty CSS to keep browser happy in dev mode
+            copyDef.push({ from: path.resolve(context + 'webpack/empty.js'), to: path.join(appName, 'oskari.min.css') }); // empty CSS to keep browser happy in dev mode
         }
         entries[appName] = [
             path.resolve(context, './webpack/polyfill.js'),
             path.resolve(context, './webpack/oskari-core.js'),
             targetPath
         ];
-        plugins.push(new CopyWebpackPlugin(copyDef));
+        plugins.push(new CopyWebpackPlugin({ patterns: copyDef }));
         plugins.push(new LocalizationPlugin(appName));
     });
 

@@ -25,6 +25,22 @@ const getStyleFileRules = (isProd) => {
                 { loader: 'css-loader', options: { } },
                 'sass-loader' // compiles Sass to CSS
             ]
+<<<<<<< HEAD
+=======
+        },
+        {
+            test: /\.less$/,
+            use: [
+                styleLoaderImpl,
+                { loader: 'css-loader' },
+                {
+                    loader: 'less-loader',
+                    options: {
+                        lessOptions: lessLoaderOptions
+                    }
+                }
+            ]
+>>>>>>> webpack-update
         }
     ];
     return rules;
@@ -135,6 +151,9 @@ const RESOLVE = {
     symlinks: false,
     alias: {
         'oskari-ui': path.resolve(__dirname, '../src/react')
+    },
+    fallback: {
+        fs: false
     }
 };
 const RESOLVE_LOADER = {
