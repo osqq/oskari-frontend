@@ -15,7 +15,7 @@ module.exports = function generateEntries (appsetupPaths, isProd, context) {
         }),
         new CopyWebpackPlugin({
             patterns: [
-                { from: path.resolve(context + 'resources'), to: 'resources' }
+                { from: path.resolve(context + '/resources'), to: 'resources' }
             ]
         })
     ];
@@ -40,7 +40,7 @@ module.exports = function generateEntries (appsetupPaths, isProd, context) {
             { from: path.resolve(context + '/resources/icons.png'), to: appName }
         ];
         if (!isProd) {
-            copyDef.push({ from: path.resolve(context + 'webpack/empty.js'), to: path.join(appName, 'oskari.min.css') }); // empty CSS to keep browser happy in dev mode
+            copyDef.push({ from: path.resolve(context + '/webpack/empty.js'), to: path.join(appName, 'oskari.min.css') }); // empty CSS to keep browser happy in dev mode
         }
         entries[appName] = [
             path.resolve(context, './webpack/polyfill.js'),
