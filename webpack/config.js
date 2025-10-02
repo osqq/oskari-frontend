@@ -119,6 +119,11 @@ const getModuleRules = (isProd = false) => {
             generator: {
                 filename: 'assets/[name].[ext]'
             }
+        },
+        {
+            test: /\.m?js$/,
+            include: /node_modules[\\/]olcs[\\/]/,
+            resolve: { fullySpecified: false } // exception to allow import ../core instead of ../core.js from olcs
         }
     ];
     return rules;
