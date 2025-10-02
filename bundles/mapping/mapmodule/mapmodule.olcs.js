@@ -34,12 +34,13 @@ window.Cesium = Cesium;
     } catch (e) {
         // Need to polyfill - fall through
     }
-    var MouseEvent = function (eventType, params) {
+    let MouseEvent = function (eventType, params) {
         params = params || { bubbles: false, cancelable: false };
-        var mouseEvent = document.createEvent('MouseEvent');
+        let mouseEvent = document.createEvent('MouseEvent');
         mouseEvent.initMouseEvent(eventType, params.bubbles, params.cancelable, window, 0, params.screenX || 0, params.screenY || 0, params.clientX || 0, params.clientY || 0, false, false, false, false, 0, null);
         return mouseEvent;
     };
+
     MouseEvent.prototype = Event.prototype;
     window.MouseEvent = MouseEvent;
 })(window);
@@ -285,7 +286,7 @@ class MapModuleOlCesium extends MapModuleOl {
         handler.setInputAction(getClickHandler(true), Cesium.ScreenSpaceEventType.LEFT_CLICK, Cesium.KeyboardEventModifier.CTRL);
 
         const notifyMouseHover = (lonlat, pixel, paused) => {
-            var hoverEvent = Oskari.eventBuilder('MouseHoverEvent')(
+            let hoverEvent = Oskari.eventBuilder('MouseHoverEvent')(
                 lonlat.lon,
                 lonlat.lat,
                 paused,
@@ -336,6 +337,7 @@ class MapModuleOlCesium extends MapModuleOl {
         });
         return hits;
     }
+
     _forEachFeatureAtPixelImpl (pixel, callback) {
         if (!this._map3D.getEnabled()) {
             super._forEachFeatureAtPixelImpl(pixel, callback);
@@ -358,6 +360,7 @@ class MapModuleOlCesium extends MapModuleOl {
     getTime () {
         return this._time || new Date();
     }
+
     /**
      * @method getJulianTime
      * Gets time set for map in Julian date
@@ -366,6 +369,7 @@ class MapModuleOlCesium extends MapModuleOl {
     getJulianTime () {
         return Cesium.JulianDate.fromDate(this.getTime());
     }
+
     /**
      * @method getTimeParams
      * Gets time paramaters set for map
@@ -379,6 +383,7 @@ class MapModuleOlCesium extends MapModuleOl {
             year: time.getFullYear()
         };
     }
+
     /**
      * @method setTime
      * Sets time for map
@@ -401,7 +406,7 @@ class MapModuleOlCesium extends MapModuleOl {
     }
 
     getMapZoom () {
-        var zoomlevel = this.getMap().getView().getZoom();
+        let zoomlevel = this.getMap().getView().getZoom();
         if (typeof (zoomlevel) === 'undefined' || zoomlevel === 0) {
             // Cesium view has been zoomed outside ol zoomlevels.
             zoomlevel = this._lastKnownZoomLevel;
@@ -464,6 +469,7 @@ class MapModuleOlCesium extends MapModuleOl {
         }
         super.isLayerVisible(layer);
     }
+
     /**
      * @param {Object} layerImpl ol/layer/Layer or Cesium.Cesium3DTileset, olcs specific!
      */
@@ -602,6 +608,7 @@ class MapModuleOlCesium extends MapModuleOl {
             });
         }
     }
+
     /**
      * Function to reset map move mode and 3D camera controls to default.
      * This is needed since user might click reset map view or pan map on panbuttons when camera is in rotate mode.
@@ -613,6 +620,7 @@ class MapModuleOlCesium extends MapModuleOl {
             cameraControlsPlugin.resetState();
         }
     }
+
     /**
      * Set camera to rotate mode
      *
@@ -639,6 +647,7 @@ class MapModuleOlCesium extends MapModuleOl {
             return true;
         }
     }
+
     panMapByPixels (pX, pY) {
         const plugin = this._pluginInstances.CameraControls3dPlugin;
         if (plugin && plugin.isRotating()) {
@@ -658,10 +667,11 @@ class MapModuleOlCesium extends MapModuleOl {
         this._map3D.getCamera().updateView();
         this._enableMapMoveControls();
     }
+
     _disableMapMoveControls () {
         const styleClass = 'map-move-control-disabled';
         const mapInMobileMode = Oskari.util.isMobile();
-        var controlSelectors;
+        let controlSelectors;
 
         if (mapInMobileMode) {
             controlSelectors = this._getMobileMapControlSelectors();
@@ -680,10 +690,11 @@ class MapModuleOlCesium extends MapModuleOl {
             control.addClass(styleClass);
         });
     }
+
     _enableMapMoveControls () {
         const styleClass = 'map-move-control-disabled';
         const mapInMobileMode = Oskari.util.isMobile();
-        var controlSelectors;
+        let controlSelectors;
 
         if (mapInMobileMode) {
             controlSelectors = this._getMobileMapControlSelectors();
@@ -702,12 +713,15 @@ class MapModuleOlCesium extends MapModuleOl {
             control.removeClass(styleClass);
         });
     }
+
     _getMobileMapControlSelectors () {
         return ['.mobileToolbarContent .mobile-zoom-in', '.mobileToolbarContent .mobile-zoom-out', '.mobileToolbarContent .mobile-my-location', '.mobileToolbarContent .mobile-xy', '.mobileToolbarContent .mobile-north', '.mobileToolbarContent .camera-controls-3d i:nth-child(3)', '.mobileToolbarContent .camera-controls-3d i:nth-child(4)'];
     }
+
     _getDesktopMapControlSelectors () {
         return ['.mappluginsContainer .maprotator', '.mappluginsContainer .coordinatetool', '.mappluginsContainer .mylocationplugin'];
     }
+
     _toRadians (value) {
         return !isNaN(value) ? Cesium.Math.toRadians(value) : undefined;
     }
@@ -718,10 +732,10 @@ class MapModuleOlCesium extends MapModuleOl {
      * @return {Object} properties for each pluginName
      */
     getState () {
-        var state = {
+        let state = {
             plugins: {}
         };
-        var pluginName;
+        let pluginName;
         for (pluginName in this._pluginInstances) {
             if (this._pluginInstances.hasOwnProperty(pluginName) && this._pluginInstances[pluginName].getState) {
                 state.plugins[pluginName] = this._pluginInstances[pluginName].getState();
