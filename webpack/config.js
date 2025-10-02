@@ -25,22 +25,6 @@ const getStyleFileRules = (isProd) => {
                 { loader: 'css-loader', options: { } },
                 'sass-loader' // compiles Sass to CSS
             ]
-<<<<<<< HEAD
-=======
-        },
-        {
-            test: /\.less$/,
-            use: [
-                styleLoaderImpl,
-                { loader: 'css-loader' },
-                {
-                    loader: 'less-loader',
-                    options: {
-                        lessOptions: lessLoaderOptions
-                    }
-                }
-            ]
->>>>>>> webpack-update
         }
     ];
     return rules;
@@ -131,14 +115,10 @@ const getModuleRules = (isProd = false) => {
         ...styleFileRules,
         {
             test: /\.(ttf|png|jpg|gif|svg)$/,
-            use: [
-                {
-                    loader: 'file-loader',
-                    options: {
-                        outputPath: 'assets/'
-                    }
-                }
-            ]
+            type: 'asset/resource',
+            generator: {
+                filename: 'assets/[name].[ext]'
+            }
         }
     ];
     return rules;
