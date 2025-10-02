@@ -91,8 +91,12 @@ module.exports = (env, argv) => {
         config.optimization = {
             minimizer: [
                 new TerserPlugin({
-                    sourceMap: true,
-                    parallel: true
+                    parallel: true,
+                    extractComments: false,
+                    terserOptions: {
+                        format: { comments: false },
+                        compress: { passes: 2 }
+                    }
                 }),
                 new CssMinimizerWebpackPlugin({})
             ]
