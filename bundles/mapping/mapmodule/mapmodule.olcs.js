@@ -15,10 +15,9 @@ import { MapModule as MapModuleOl } from './MapModuleClass.ol';
 import { LAYER_ID, VECTOR_STYLE } from './domain/constants';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-// import 'ol-cesium/css/olcs.css';
 
-// There is an "./*": "./lib/olcs/*.js" redirect in olcs's package.json exports and webpack can't seem to be able to cope with it. Commenting this for now.
-// import 'olcs/css/olcs.css';
+// eslint-disable-next-line import/no-unresolved
+import 'olcs/css/olcs.css';
 
 import './event/TimeChangedEvent';
 dayjs.extend(customParseFormat);
