@@ -55,8 +55,10 @@ These bundles have been migrated from under `packages` to `bundles` and/or to th
 - packages/mapping/ol/mapmyplaces/bundle.js -> bundles/mapping/mapmyplaces
 - packages/mapping/ol/mapuserlayers/bundle.js -> bundles/framework/myplacesimport/mapuserlayers
 - packages/mapping/ol/maparcgis/bundle.js -> bundles/mapping/maparcgis
+- packages/framework/bundle/rpc/bundle.js -> bundles/framework/rpc
 - packages/mapping/olcs/mapmodule/bundle.js -> bundles/mapping/mapmodule/map3d_olcs
 - packages/mapping/olcs/map3dtiles/bundle.js -> bundles/mapping/tiles3d
+
 
 #### Bundles combined
 
