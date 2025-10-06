@@ -20,7 +20,7 @@ Does not support:
 
 ## Screenshot
 
-![screenshot](wfslayer.png)
+![screenshot](images/wfslayer.png)
 
 ## Plugin config
 
