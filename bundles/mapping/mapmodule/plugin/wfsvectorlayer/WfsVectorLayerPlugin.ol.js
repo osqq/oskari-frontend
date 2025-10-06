@@ -122,7 +122,9 @@ export class WfsVectorLayerPlugin extends AbstractVectorLayerPlugin {
         eventKeys.forEach(eventName => {
             handlers[eventName] = event => {
                 [vectorHandlers, mvtHandlers, commonHandlers].forEach(handlerModule => {
-                    handlerModule[eventName](event);
+                    if (typeof handlerModule[eventName] === 'function') {
+                        handlerModule[eventName](event);
+                    }
                 });
             };
         });
