@@ -28,9 +28,6 @@ Oskari.clazz.define("Oskari.mapframework.bundle.mapmyplaces.MapMyPlacesBundle", 
             }, {
                 "type": "text/javascript",
                 "src": "../../../../bundles/mapping/mapmyplaces/domain/MyPlacesLayer.js"
-            }, {
-                "type" : "text/javascript",
-                "src" : "../../../../bundles/mapping/mapmyplaces/event/MyPlacesVisualizationChangeEvent.js"
             }],
             "locales": [{
                 "lang": "fi",
