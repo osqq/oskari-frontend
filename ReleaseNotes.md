@@ -48,6 +48,7 @@ These bundles have been migrated from under `packages` to `bundles` and/or to th
 - packages/mapping/ol/drawtools/bundle.js -> bundles/mapping/drawtools
 - packages/mapping/ol/infobox/bundle.js -> bundles/mapping/infobox
 - packages/mapping/ol/heatmap/bundle.js -> bundles/mapping/heatmap
+- packages/mapping/ol/layerswipe/bundle.js -> bundles/mapping/layerswipe
 - packages/mapping/olcs/mapmodule/bundle.js -> bundles/mapping/mapmodule/map3d_olcs
 - packages/mapping/olcs/map3dtiles/bundle.js -> bundles/mapping/tiles3d
 
