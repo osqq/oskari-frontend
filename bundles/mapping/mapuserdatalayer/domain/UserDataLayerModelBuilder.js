@@ -7,6 +7,7 @@ export class UserDataLayerModelBuilder {
         this.sandbox = sandbox;
         this.types = {};
     }
+
     registerLayerType (layerService, options) {
         const { type, inspire, ...toStore } = options;
 
