@@ -28,8 +28,8 @@ module.exports = (env, argv) => {
 
     // entries are configs for each app, plugins accumulate resource copying etc from all the apps
     const { entries, plugins } = generateEntries(appsetupPaths, isProd, __dirname);
-
-    plugins.push(new NormalModuleReplacementPlugin(/^olcs\/css\/olcs\.css$/, path.resolve(__dirname, 'node_modules/olcs/css/olcs.css')))
+    const olcsPath = isProd ? path.resolve(process.cwd(), './node_modules/olcs/css/olcs.css') : path.resolve(process.cwd(), './node_modules/oskari-frontend/node_modules/olcs/css/olcs.css');
+    plugins.push(new NormalModuleReplacementPlugin(/^olcs\/css\/olcs\.css$/, olcsPath));
     plugins.push(new MiniCssExtractPlugin({
         filename: '[name]/oskari.min.css'
     }));
