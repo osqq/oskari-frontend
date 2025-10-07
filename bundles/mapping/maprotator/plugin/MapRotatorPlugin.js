@@ -1,4 +1,5 @@
 import React from 'react';
+import '../../mapmodule/plugin/BasicMapModulePlugin';
 import { MapModuleButton } from '../../mapmodule/MapModuleButton';
 import olInteractionDragRotate from 'ol/interaction/DragRotate';
 import { unByKey } from 'ol/Observable';
