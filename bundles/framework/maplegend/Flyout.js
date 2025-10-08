@@ -1,14 +1,8 @@
 import React from 'react';
 import { Message } from 'oskari-ui';
-<<<<<<< HEAD
 import { LocaleProvider, ThemeProvider } from 'oskari-ui/util';
 import { MapLegendList } from './components/MapLegendList';
-=======
-import { LocaleProvider } from 'oskari-ui/util';
-import { MapLegendList } from './MapLegendList';
-import { ThemeProvider } from 'oskari-ui/util';
 import { createRoot } from 'react-dom/client';
->>>>>>> b8b7e56ad (replace ReactDOM.render/unmountComponentAtNode with createRoot().render / unmount)
 
 /**
  * @class Oskari.mapframework.bundle.maplegend.Flyout
