@@ -32,7 +32,7 @@ module.exports = (env, argv) => {
     const devPath = path.resolve(process.cwd(), './node_modules/oskari-frontend/node_modules/olcs/css/olcs.css'); // works with build:dev & start:dev
     const prodPath = path.resolve(process.cwd(), './node_modules/olcs/css/olcs.css'); // works with build & start
     const devModeEnabled = lstatSync('./node_modules/oskari-frontend').isSymbolicLink();
-    const olcsPath = devModeEnabled ?  devPath : prodPath;
+    const olcsPath = devModeEnabled ? devPath : prodPath;
 
     plugins.push(new NormalModuleReplacementPlugin(/^olcs\/css\/olcs\.css$/, olcsPath));
     plugins.push(new MiniCssExtractPlugin({

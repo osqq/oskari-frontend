@@ -1,17 +1,17 @@
 const fs = require('fs');
 const path = require('path');
-const merge = require('merge');;
-const { sources, Compilation } = require('webpack');
+const merge = require('merge');
+const { sources } = require('webpack');
 
 const fileRex = /^(.{2,3})\.js$/;
-const pluginName = 'LocalizationPlugin'
+const pluginName = 'LocalizationPlugin';
 
 function isLocaleFile (filePath) {
     if (path.basename(path.dirname(filePath)) !== 'locale') {
         return false;
     }
     const parts = filePath.split(path.sep);
-    if (parts[parts.length -3] !== 'resources') {
+    if (parts[parts.length - 3] !== 'resources') {
         // this could be things like:
         // - oskari-frontend\node_modules\moment\locale\af.js
         // - oskari-frontend\node_modules\antd\es\locale\en_US.js
@@ -97,7 +97,7 @@ const readLocalizationContent = (localeFiles) => {
         result[lang] = fileContent;
     }
     return result;
-}
+};
 
 /**
  * 1) Processes oskari-frontend/bundles/[bundle id]/resources/locale/[lang].js,
@@ -108,32 +108,33 @@ class LocalizationPlugin {
     constructor (appName) {
         this.appPath = appName ? appName + '/' : '';
     }
+
     apply (compiler) {
-/*
-This implementation gives deprecation warning:
-        [DEP_WEBPACK_COMPILATION_ASSETS] DeprecationWarning: Compilation.assets will be frozen in future, all modifications are deprecated.
-        BREAKING CHANGE: No more changes should happen to Compilation.assets after sealing the Compilation.
-                Do changes to assets earlier, e. g. in Compilation.hooks.processAssets.
-                Make sure to select an appropriate stage from Compilation.PROCESS_ASSETS_STAGE_*.
-*/
+        /*
+        This implementation gives deprecation warning:
+                [DEP_WEBPACK_COMPILATION_ASSETS] DeprecationWarning: Compilation.assets will be frozen in future, all modifications are deprecated.
+                BREAKING CHANGE: No more changes should happen to Compilation.assets after sealing the Compilation.
+                        Do changes to assets earlier, e. g. in Compilation.hooks.processAssets.
+                        Make sure to select an appropriate stage from Compilation.PROCESS_ASSETS_STAGE_*.
+        */
         compiler.hooks.emit.tap(pluginName, (compilation) => {
             const localeFiles = Array.from(compilation.fileDependencies).filter(isLocaleFile);
-                
-            const oskariLangContents = readLocalizationContent(localeFiles)
+
+            const oskariLangContents = readLocalizationContent(localeFiles);
             Object.keys(oskariLangContents).forEach(lang => {
                 const fileContent = oskariLangContents[lang];
                 compilation.emitAsset(`${this.appPath}oskari_lang_${lang}.js`, new sources.RawSource(fileContent));
             });
         });
 
-// Here's some links that might help updating the impl:
-//  problem so far is that the process assets only get "asset" files like svg/png or files from dependencies (moment/locale etc)
-//  The solution requires processing of the actual source files in the app and oskari-frontend/oskari-frontend-contrib etc
-// https://stackoverflow.com/questions/65535038/webpack-processassets-hook-and-asset-source
-// https://github.com/webpack/webpack/issues/11425
-// https://survivejs.com/webpack/extending/plugins/
-// https://webpack.js.org/api/compilation-hooks/#processassets
-/*
+        // Here's some links that might help updating the impl:
+        //  problem so far is that the process assets only get "asset" files like svg/png or files from dependencies (moment/locale etc)
+        //  The solution requires processing of the actual source files in the app and oskari-frontend/oskari-frontend-contrib etc
+        // https://stackoverflow.com/questions/65535038/webpack-processassets-hook-and-asset-source
+        // https://github.com/webpack/webpack/issues/11425
+        // https://survivejs.com/webpack/extending/plugins/
+        // https://webpack.js.org/api/compilation-hooks/#processassets
+        /*
         compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
               compilation.hooks.processAssets.tap({
                 name: pluginName,
@@ -151,10 +152,11 @@ This implementation gives deprecation warning:
         */
     }
 }
+
 // try to get file links when processing assets (so we get rid of deprecation warning)
+// eslint-disable-next-line no-unused-vars
 const getScriptFilesForChunks = (compilation) => {
     const { chunks } = compilation.getStats().toJson({ chunks: true });
-    const { publicPath } = compilation.options.output;
     const scriptFiles = new Set();
 
     chunks.forEach(chunk => {
@@ -167,7 +169,7 @@ const getScriptFilesForChunks = (compilation) => {
             .filter(name => !!name && isLocaleFile(name))
             .forEach(name => scriptFiles.add(name));
         if (scriptFiles.length > before) {
-            const { modules, names, runtime, ...rest} = chunk;
+            const { names, runtime } = chunk;
             console.log('chunk: ', names, runtime);
         }
     });
