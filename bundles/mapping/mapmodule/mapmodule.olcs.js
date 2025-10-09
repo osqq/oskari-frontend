@@ -20,6 +20,10 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import 'olcs/css/olcs.css';
 
 import './event/TimeChangedEvent';
+import './plugin/layers/LayersPlugin.olcs';
+
+import 'olcs/css/olcs.css';
+
 dayjs.extend(customParseFormat);
 // OL-cesium expects to find this global
 window.Cesium = Cesium;
