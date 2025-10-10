@@ -16,7 +16,6 @@ import { LAYER_ID, VECTOR_STYLE } from './domain/constants';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-// eslint-disable-next-line import/no-unresolved
 import 'olcs/css/olcs.css';
 
 import './event/TimeChangedEvent';
