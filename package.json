@@ -51,7 +51,6 @@
     "babel-plugin-transform-remove-strict-mode": "0.0.2",
     "copy-webpack-plugin": "13.0.1",
     "core-js": "3.45.1",
-    "corejs": "1.0.0",
     "css-loader": "5.2.7",
     "css-minimizer-webpack-plugin": "7.0.2",
     "d3": "7.9.0",
