@@ -4,6 +4,7 @@ const js = require('@eslint/js');
 const nodePlugin = require('eslint-plugin-n');
 const importPlugin = require('eslint-plugin-import');
 const reactPlugin = require('eslint-plugin-react');
+const reactHooksPlugin = require('eslint-plugin-react-hooks');
 
 const resolveConfig = require('./webpack/config.js').RESOLVE;
 
@@ -47,11 +48,12 @@ module.exports = defineConfig([
             }
         },
 
-        plugins: { import: importPlugin, n: nodePlugin, react: reactPlugin },
+        plugins: { 'import': importPlugin, 'n': nodePlugin, 'react': reactPlugin, 'react-hooks': reactHooksPlugin },
         rules: {
             ...importPlugin.configs.errors.rules,
             ...importPlugin.configs.warnings.rules,
             ...reactPlugin.configs.recommended.rules,
+            ...reactHooksPlugin.configs.recommended.rules,
             'n/no-callback-literal': 'error',
             'no-restricted-properties': ['error', {
                 property: 'getRequestBuilder',
