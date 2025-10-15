@@ -1,18 +1,14 @@
 const { defineConfig, globalIgnores } = require('eslint/config');
 const globals = require('globals');
-const { fixupConfigRules } = require('@eslint/compat');
 const js = require('@eslint/js');
-const { FlatCompat } = require('@eslint/eslintrc');
 const nodePlugin = require('eslint-plugin-n');
+const importPlugin = require('eslint-plugin-import');
+const reactPlugin = require('eslint-plugin-react');
 
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
 const resolveConfig = require('./webpack/config.js').RESOLVE;
 
 module.exports = defineConfig([
+    js.configs.recommended,
     {
         languageOptions: {
             globals: {
@@ -44,18 +40,18 @@ module.exports = defineConfig([
 
             ecmaVersion: 2020,
             sourceType: 'module',
-            parserOptions: {}
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true
+                }
+            }
         },
 
-        plugins: { n: nodePlugin },
-        extends: fixupConfigRules(compat.extends(
-            'eslint:recommended',
-            'plugin:import/errors',
-            'plugin:import/warnings',
-            'plugin:react/recommended'
-        )),
-
+        plugins: { import: importPlugin, n: nodePlugin, react: reactPlugin },
         rules: {
+            ...importPlugin.configs.errors.rules,
+            ...importPlugin.configs.warnings.rules,
+            ...reactPlugin.configs.recommended.rules,
             'n/no-callback-literal': 'error',
             'no-restricted-properties': ['error', {
                 property: 'getRequestBuilder',
@@ -90,7 +86,7 @@ module.exports = defineConfig([
                 destructuring: 'any',
                 ignoreReadBeforeAssign: false
             }],
-
+            'no-var': ['warn'],
             'no-prototype-builtins': 'warn',
 
             'object-curly-newline': ['error', {
