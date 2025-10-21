@@ -157,7 +157,10 @@ module.exports = defineConfig([
                     config: {
                         resolve: resolveConfig
                     }
-                }
+                },
+                // This will enable importing based on modules package.json exports-field
+                // Make sure to use the same file extensions as for webpack to avoid the possibility of conflict.
+                node: { extensions: resolveConfig.extensions }
             },
 
             'react': {
