@@ -291,9 +291,9 @@ class UIHandler extends AsyncStateHandler {
     close (id) {
         if (this.controls[id]) {
             this.controls[id].close();
+            this.notifyExtensions(id, false);
         }
         this.controls[id] = null;
-        this.notifyExtensions(id, false);
     }
 
     closeAll (skipSearch) {
