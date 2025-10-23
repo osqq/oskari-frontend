@@ -5,16 +5,15 @@ import { Button as AntButton } from 'antd';
 import { ThemeConsumer } from 'oskari-ui/util';
 import { getNavigationTheme } from 'oskari-ui/theme';
 
-export const Button = ({ children, className, loading = false, ...other }) => {
-    let modifiedClass = className || '';
-    if (!modifiedClass.includes('t_button')) {
-        modifiedClass = 't_button ' + className;
-    }
+export const Button = ({ children, className = '', loading = false, ...other }) => {
+    const modifiedClass = className.includes('t_button') ? className : `t_button ${className}`;
     return (<AntButton className={modifiedClass} loading={loading} {...other}>{children}</AntButton>);
 };
 
 Button.propTypes = {
-    children: PropTypes.any
+    children: PropTypes.any,
+    className: PropTypes.string,
+    loading: PropTypes.bool
 };
 
 const StyledButton = styled(Button)`

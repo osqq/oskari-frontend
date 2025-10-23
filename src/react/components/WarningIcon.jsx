@@ -16,5 +16,8 @@ export const WarningIcon = (props) => {
 };
 
 WarningIcon.propTypes = {
-    tooltip: PropTypes.string
+    tooltip: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.node
+    ])
 };
