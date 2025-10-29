@@ -487,7 +487,7 @@ Oskari.clazz.define(
             const geojson = this.getFeaturesAsGeoJSON(features);
             const bufferedGeoJson = this.getFeaturesAsGeoJSON(bufferFeatures);
 
-            const data = { buffer, shape, showMeasureOnMap, bufferedGeojson: bufferedGeoJson };
+            const data = { buffer, shape, showMeasureOnMap, bufferedGeoJson };
 
             // aggregated area and length in base units (m, m²)
             let sumArea = 0;
@@ -504,7 +504,7 @@ Oskari.clazz.define(
             if (format === 'nauticalMiles') {
                 let sumLengthNautical = 0;
                 features.forEach(f => {
-                    const { length, lengthNauticalMiles, area, areaNauticalMiles } = f.getProperties();
+                    const { length, lengthNauticalMiles } = f.getProperties();
                     if (typeof lengthNauticalMiles === 'number') {
                         sumLengthNautical += lengthNauticalMiles;
                     } else if (length) {

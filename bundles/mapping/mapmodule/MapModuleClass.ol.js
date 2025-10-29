@@ -518,9 +518,11 @@ export class MapModule extends AbstractMapModule {
     /**
      * Formats the measurement to ui.
      * Returns a string with the measurement and
-     * an appropriate unit (m/km or m²/ha/km²)
+     * an appropriate unit (m/km or m²/ha/km² or M (m/km))
      * or an empty string for point.
-     *
+     * 
+     * @public @method formatMeasurementResult
+     * 
      * @param  {number} measurement
      * @param  {String} drawMode
      * @param  {Number} fixedDigits (optional)
@@ -534,65 +536,51 @@ export class MapModule extends AbstractMapModule {
         const METERS_PER_NAUTICAL_MILE = 1852;
         const zoomedForAccuracy = this.getResolution() < 1;
 
-        // helper to format number with decimal separator and digits
+        // helper to format number with decimal separator and chosen digits
         const fmt = (value, digits) => value.toFixed(digits).replace('.', Oskari.getDecimalSeparator());
 
         // default format for line (m / km)
-        const defaultLineFormat = (m) => {
-            if (m >= 1000) {
-                const result = m / 1000;
+        const defaultLineFormat = (measurement, fixedDigits) => {
+            if (measurement >= 1000) {
+                const result = measurement / 1000;
                 const decimals = 3;
-                return fmt(result, decimals) + ' km';
+                const digits = fixedDigits !== undefined ? fixedDigits : decimals;
+                return fmt(result, digits) + ' km';
             }
             const decimals = zoomedForAccuracy ? 1 : 0;
-            return fmt(m, decimals) + ' m';
+            const digits = fixedDigits !== undefined ? fixedDigits : decimals;
+            return fmt(measurement, digits) + ' m';
         };
 
-        let mainResult, mainUnit, mainDecimals;
-
         if (drawMode === 'area') {
-            // 1 000 000 m² === 1 km²
             if (measurement >= 1000000) {
-                result = measurement / 1000000; // (Math.round(measurement) / 1000000);
-                decimals = 3;
-                unit = 'km²';
+                const result = measurement / 1000000;
+                const decimals = 3;
+                const digits = fixedDigits !== undefined ? fixedDigits : decimals;
+                return fmt(result, digits) + ' km²';
             } else if (measurement < 10000) {
-                result = measurement;// (Math.round(100 * measurement) / 100);
-                decimals = zoomedForAccuracy ? 1 : 0;
-                unit = 'm²';
-            } else {
-                result = measurement / 10000; // (Math.round(100 * measurement) / 100);
-                decimals = 2;
-                unit = 'ha';
+                const decimals = zoomedForAccuracy ? 1 : 0;
+                const digits = fixedDigits !== undefined ? fixedDigits : decimals;
+                return fmt(measurement, digits) + ' m²';
             }
+            const result = measurement / 10000;
+            const decimals = 2;
+            const digits = fixedDigits !== undefined ? fixedDigits : decimals;
+            return fmt(result, digits) + ' ha';
         } else if (drawMode === 'line') {
+            // support nautical miles format: "X M (Y km)" or "X M (Z m)"
             if (format === 'nauticalMiles') {
-                // main is nautical miles, fallback is m or km
                 const nauticalMiles = measurement / METERS_PER_NAUTICAL_MILE;
-                mainResult = nauticalMiles;
-                mainDecimals = 2;
-                mainUnit = 'M';
-                const digits = fixedDigits !== undefined ? fixedDigits : mainDecimals;
-                const mainStr = fmt(mainResult, digits) + ' ' + mainUnit;
-                const fallback = defaultLineFormat(measurement);
+                const mainDecimals = 2;
+                const mainDigits = fixedDigits !== undefined ? fixedDigits : mainDecimals;
+                const mainStr = fmt(nauticalMiles, mainDigits) + ' M';
+                const fallback = defaultLineFormat(measurement); // meters/kilometers in parentheses
                 return `${mainStr} (${fallback})`;
-            } else {
-                // default (m / km) behaviour
-                if (measurement >= 1000) {
-                    mainResult = measurement / 1000;
-                    mainDecimals = 3;
-                    mainUnit = 'km';
-                } else {
-                    mainResult = measurement;
-                    mainDecimals = zoomedForAccuracy ? 1 : 0;
-                    mainUnit = 'm';
-                }
-                const digits = fixedDigits !== undefined ? fixedDigits : mainDecimals;
-                return fmt(mainResult, digits) + ' ' + mainUnit;
             }
-        } else {
-            return '';
+            // default (m / km) behaviour
+            return defaultLineFormat(measurement, fixedDigits);
         }
+        return '';
     }
 
     /**
