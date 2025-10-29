@@ -108,6 +108,9 @@ Limits are used for validating finished geometry. If geometry is invalid, user w
 <tr>
   <td>length</td><td>Number</td><td>Maximum length for valid line in meters.</td><td>infinite</td>
 </tr>
+<tr>
+  <td>lengthNauticalMiles</td><td>Number</td><td>Maximum length for valid line in nautical miles (only with option "measurementFormat").</td><td>infinite</td>
+</tr>
 </table>
 
 ## Examples
