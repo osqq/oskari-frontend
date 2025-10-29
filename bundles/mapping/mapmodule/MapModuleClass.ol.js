@@ -521,22 +521,34 @@ export class MapModule extends AbstractMapModule {
      * an appropriate unit (m/km or m²/ha/km²)
      * or an empty string for point.
      *
-     * @public @method formatMeasurementResult
-     *
      * @param  {number} measurement
      * @param  {String} drawMode
      * @param  {Number} fixedDigits (optional)
+     * @param  {String} format (optional) - e.g. 'nauticalMiles'
      * @return {String}
-     *
      */
-    formatMeasurementResult (measurement, drawMode, fixedDigits) {
+    formatMeasurementResult (measurement, drawMode, fixedDigits, format) {
         if (typeof measurement !== 'number') {
             return;
         }
-        let result;
-        let unit;
-        let decimals;
+        const METERS_PER_NAUTICAL_MILE = 1852;
         const zoomedForAccuracy = this.getResolution() < 1;
+
+        // helper to format number with decimal separator and digits
+        const fmt = (value, digits) => value.toFixed(digits).replace('.', Oskari.getDecimalSeparator());
+
+        // default format for line (m / km)
+        const defaultLineFormat = (m) => {
+            if (m >= 1000) {
+                const result = m / 1000;
+                const decimals = 3;
+                return fmt(result, decimals) + ' km';
+            }
+            const decimals = zoomedForAccuracy ? 1 : 0;
+            return fmt(m, decimals) + ' m';
+        };
+
+        let mainResult, mainUnit, mainDecimals;
 
         if (drawMode === 'area') {
             // 1 000 000 m² === 1 km²
@@ -554,24 +566,33 @@ export class MapModule extends AbstractMapModule {
                 unit = 'ha';
             }
         } else if (drawMode === 'line') {
-            // 1 000 m === 1 km
-            if (measurement >= 1000) {
-                result = measurement / 1000; // (Math.round(measurement) / 1000);
-                decimals = 3;
-                unit = 'km';
+            if (format === 'nauticalMiles') {
+                // main is nautical miles, fallback is m or km
+                const nauticalMiles = measurement / METERS_PER_NAUTICAL_MILE;
+                mainResult = nauticalMiles;
+                mainDecimals = 2;
+                mainUnit = 'M';
+                const digits = fixedDigits !== undefined ? fixedDigits : mainDecimals;
+                const mainStr = fmt(mainResult, digits) + ' ' + mainUnit;
+                const fallback = defaultLineFormat(measurement);
+                return `${mainStr} (${fallback})`;
             } else {
-                result = measurement; // (Math.round(100 * measurement) / 100);
-                decimals = zoomedForAccuracy ? 1 : 0;
-                unit = 'm';
+                // default (m / km) behaviour
+                if (measurement >= 1000) {
+                    mainResult = measurement / 1000;
+                    mainDecimals = 3;
+                    mainUnit = 'km';
+                } else {
+                    mainResult = measurement;
+                    mainDecimals = zoomedForAccuracy ? 1 : 0;
+                    mainUnit = 'm';
+                }
+                const digits = fixedDigits !== undefined ? fixedDigits : mainDecimals;
+                return fmt(mainResult, digits) + ' ' + mainUnit;
             }
         } else {
             return '';
         }
-        const digits = fixedDigits !== undefined ? fixedDigits : decimals;
-        return result.toFixed(digits).replace(
-            '.',
-            Oskari.getDecimalSeparator()
-        ) + ' ' + unit;
     }
 
     /**

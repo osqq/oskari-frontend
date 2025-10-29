@@ -38,6 +38,9 @@ const OPTIONS = {
 };
 const isModifyLimited = shape => ['Square', 'Circle', 'Box'].includes(shape);
 
+// nautical mile constant (used for numeric property and aggregated value)
+const METERS_PER_NAUTICAL_MILE = 1852;
+
 /**
  * @class Oskari.mapping.drawtools.plugin.DrawPlugin
  * Map engine specific implementation for draw tools
@@ -192,7 +195,7 @@ Oskari.clazz.define(
                 options.limits.areaTooltip = `${warn} ${tip}`;
             }
             if (limits.length) {
-                const formatted = this.getMapModule().formatMeasurementResult(limits.length, 'line', 0);
+                const formatted = this.getMapModule().formatMeasurementResult(limits.length, 'line', 0, options.measurementFormat);
                 const warn = this.loc(INVALID_REASONS.LINE_LENGTH, { length: formatted });
                 const tip = this.loc(`${locPath}.line`);
                 options.limits.lengthTooltip = `${warn} ${tip}`;
@@ -469,6 +472,7 @@ Oskari.clazz.define(
         sendDrawingEvent: function (isFinished = false) {
             const shape = this.getShape();
             const { showMeasureOnMap, buffer } = this.getOpts();
+            const format = this.getOpts('measurementFormat');
 
             const features = this.getDrawFeatures();
             let bufferFeatures = [];
@@ -483,8 +487,9 @@ Oskari.clazz.define(
             const geojson = this.getFeaturesAsGeoJSON(features);
             const bufferedGeoJson = this.getFeaturesAsGeoJSON(bufferFeatures);
 
-            const data = { buffer, shape, showMeasureOnMap, bufferedGeoJson };
+            const data = { buffer, shape, showMeasureOnMap, bufferedGeojson: bufferedGeoJson };
 
+            // aggregated area and length in base units (m, m²)
             let sumArea = 0;
             let sumLength = 0;
             features.forEach(f => {
@@ -494,6 +499,20 @@ Oskari.clazz.define(
             });
             if (sumArea) data.area = sumArea;
             if (sumLength) data.length = sumLength;
+
+            // Only compute/attach nautical aggregates when format requests it
+            if (format === 'nauticalMiles') {
+                let sumLengthNautical = 0;
+                features.forEach(f => {
+                    const { length, lengthNauticalMiles, area, areaNauticalMiles } = f.getProperties();
+                    if (typeof lengthNauticalMiles === 'number') {
+                        sumLengthNautical += lengthNauticalMiles;
+                    } else if (length) {
+                        sumLengthNautical += length / METERS_PER_NAUTICAL_MILE;
+                    }
+                });
+                if (sumLengthNautical) data.lengthNauticalMiles = sumLengthNautical;
+            }
 
             const event = Oskari.eventBuilder('DrawingEvent')(this.getRequestId(), geojson, data, isFinished);
             this.getSandbox().notifyAll(event);
@@ -557,10 +576,13 @@ Oskari.clazz.define(
         createGeoJsonFeature: function (feature) {
             const json = geoJsonFormatter.writeFeatureObject(feature);
 
-            const { length, area, radius, buffer, tooltip, valid } = feature.getProperties();
+            const { length, lengthNauticalMiles, area, radius, buffer, tooltip, valid } = feature.getProperties();
             const properties = { valid };
             if (length) {
                 properties.length = valid ? length : tooltip;
+            }
+            if (typeof lengthNauticalMiles === 'number') {
+                properties.lengthNauticalMiles = valid ? lengthNauticalMiles : tooltip;
             }
             if (area) {
                 properties.area = valid ? area : tooltip;
@@ -571,7 +593,6 @@ Oskari.clazz.define(
             if (buffer) {
                 properties.buffer = buffer;
             }
-            // override
             json.properties = properties;
             return json;
         },
@@ -777,18 +798,26 @@ Oskari.clazz.define(
         updateMeasurements: function (feature) {
             const mapmodule = this.getMapModule();
             const geom = feature.getGeometry();
-            const format = this.getOpts('showMeasureOnMap');
+            const showMeasureOnMap = this.getOpts('showMeasureOnMap');
+            const format = this.getOpts('measurementFormat'); // e.g. 'nauticalMiles'
+
             if (geom instanceof olGeom.Polygon) {
                 const area = mapmodule.getGeomArea(geom);
                 const length = mapmodule.getGeomLength(geom);
-                const tooltip = format ? mapmodule.formatMeasurementResult(area, 'area') : '';
+                const tooltip = showMeasureOnMap ? mapmodule.formatMeasurementResult(area, 'area') : '';
                 feature.setProperties({ area, length, tooltip }, true);
                 return;
             }
             if (geom instanceof olGeom.LineString) {
                 const length = mapmodule.getGeomLength(geom);
-                const tooltip = format ? mapmodule.formatMeasurementResult(length, 'line') : '';
-                feature.setProperties({ length, tooltip }, true);
+                const tooltip = showMeasureOnMap ? mapmodule.formatMeasurementResult(length, 'line', undefined, format) : '';
+
+                const props = { length, tooltip };
+                if (format === 'nauticalMiles') {
+                    props.lengthNauticalMiles = length / METERS_PER_NAUTICAL_MILE;
+                }
+
+                feature.setProperties(props, true);
             }
         },
         updateTooltip: function (feature) {
